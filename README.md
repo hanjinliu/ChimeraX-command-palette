@@ -1,5 +1,7 @@
 # ChimeraX-command-palette
 
+![](image.png)
+
 A command palette widget for ChimeraX.
 
 ## How to use
