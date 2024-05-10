@@ -1,4 +1,3 @@
-from qt_command_palette import get_palette
 from chimerax.core.commands import CmdDesc      # Command description
 from .core import ChimeraX
 
