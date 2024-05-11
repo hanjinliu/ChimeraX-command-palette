@@ -29,8 +29,8 @@ class ChimeraX:
     
     def install_command(self):
         palette = get_palette("ChimeraX", alignment="screen")
-        palette.set_max_rows(500)
-        
+
+        # Add menu actions
         for child in self._main_window.menuBar().children():
             if not isinstance(child, QtW.QMenu):
                 continue
@@ -44,6 +44,7 @@ class ChimeraX:
                     desc=" > ".join([*context, action.text()]).replace("&", ""),
                     tooltip=action.toolTip(),
                 )
+        # Add toolbar actions
         toolbar_group = palette.add_group("Toolbar")
         for action, context in iter_toolbar_actions(self._main_window):
             toolbar_group.register(
@@ -81,6 +82,26 @@ def make_command(action: QtW.QAction):
 def iter_toolbar_actions(
     main_window: QtW.QMainWindow,
 ) -> Iterator[tuple[QtW.QAction, list[str]]]:
+    
+    tabbed = _find_tabbed_toolbar(main_window)
+    for i in range(tabbed.count()):
+        tab_name = tabbed.tabText(i)
+        toolbar = tabbed.widget(i)
+        for child in toolbar.children():
+            if type(child) is QtW.QWidget:
+                label_widget = _find_label_widget(child)
+                if label_widget is None:
+                    for action in _iter_toolbutton_action(child):
+                        text = action.text().replace("\n", " ")
+                        yield action, [tab_name, text]
+                else:
+                    label = label_widget.text()
+                    for action in _iter_toolbutton_action(child):
+                        text = action.text().replace("\n", " ")
+                        yield action, [tab_name, label, text]
+
+def _find_tabbed_toolbar(main_window: QtW.QMainWindow) -> QtW.QTabWidget:
+    """Find the TabbedToolBar in the ChimeraX main window"""
     tb: QtW.QWidget | None = None
     for c in main_window.children():
         if isinstance(c, QtW.QDockWidget):
@@ -89,22 +110,23 @@ def iter_toolbar_actions(
                 break
     if tb is None:
         raise ValueError("Toolbar not found")
-    tabbed = tb.children()[1].children()[0]
-    if not isinstance(tabbed, QtW.QTabWidget):
-        raise ValueError("Tabbed toolbar not found")
+    ttb = tb.children()[1].children()[0]
     
-    for i in range(tabbed.count()):
-        tab_name = tabbed.tabText(i)
-        toolbar = tabbed.widget(i)
-        for child in toolbar.children():
-            if type(child) is QtW.QWidget and (_children := child.children()):
-                for child in _children:
-                    if isinstance(child, QtW.QLabel):
-                        label = child.text()
-                        break
-                for tb in _children:
-                    if not isinstance(tb, QtW.QToolButton):
-                        continue
-                    action = tb.actions()[0]
-                    text = action.text().replace("\n", " ")
-                    yield action, [tab_name, label, text]
+    if not isinstance(ttb, QtW.QTabWidget):
+        raise ValueError("Tabbed toolbar not found")
+    return ttb
+
+def _find_label_widget(widget: QtW.QWidget) -> QtW.QLabel | None:
+    """Find the label widget in a section widget."""
+    children = widget.children()
+    for child in children:
+        if isinstance(child, QtW.QLabel):
+            return child
+    return None
+
+def _iter_toolbutton_action(widget: QtW.QWidget):
+    for child in widget.children():
+        if isinstance(child, QtW.QToolButton):
+            actions = child.actions()
+            if len(actions) > 0:
+                yield actions[0]

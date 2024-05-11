@@ -1,5 +1,5 @@
 <BundleInfo name="ChimeraX-command-palette"
-	    version="0.1.1" package="chimerax.command_palette"
+	    version="0.1.2" package="chimerax.command_palette"
   	    minSessionVersion="1" maxSessionVersion="1">
 
   <!-- Additional information about bundle source -->
