@@ -12,7 +12,7 @@ This widget adds all the actions in the menubar and tabbar.
     ```shell
     git clone git+https://github.com/hanjinliu/ChimeraX-command-palette
     ```
-    ... or you can manually download the contents from the "<> Code" pulldown menu.
+    ... or you can manually download the contents from the "<> Code" pulldown menu in this page.
 
 2. Install command using ChimeraX command line interface
     ```shell
@@ -23,3 +23,8 @@ This widget adds all the actions in the menubar and tabbar.
     ```shell
     fun F2 "command palette"
     ```
+
+## Issues/Requests
+
+If you find a bug, or have some feature requests, feel free to open an issue in this 
+GitHub repository, or contact me via [X/Twitter](https://twitter.com/liu_hanjin).
